@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 @Component
-@Log4j
 public class JwtHelper {
     private SecretKey secretKey;
     @Value("${jwt.expiration}")
@@ -30,8 +29,7 @@ public class JwtHelper {
     private String secret;
 
     @PostConstruct
-    public void init(){
-
+    private void init(){
         if (secret.length() < 32) {
             throw new IllegalArgumentException("Jwt secrete key must be at least 256 bite (32 bytes) long.");
         }
@@ -40,8 +38,7 @@ public class JwtHelper {
     private Claims extractAllClaims (String token) {
         return Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+    private  <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -58,7 +55,7 @@ public class JwtHelper {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
-                .signWith(secretKey, SignatureAlgorithm.ES256)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
     public String generateToken(UserDetails userDetails){
@@ -73,9 +70,6 @@ public class JwtHelper {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
-
-
 
 
 }
