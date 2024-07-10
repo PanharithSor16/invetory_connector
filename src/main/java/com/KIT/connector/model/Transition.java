@@ -1,5 +1,6 @@
 package com.KIT.connector.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,9 +27,8 @@ public class Transition {
     // Default constructor
     public Transition() {
     }
-
-
     public Transition(String username, String itemCode, String itemName, int receivedQty, int issuedQty, String location) {
+
         this.ItemCode = itemCode;
         this.ItemName = itemName;
         this.RegisterBy = username;
