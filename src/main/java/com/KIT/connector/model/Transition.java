@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -22,13 +23,14 @@ public class Transition {
     private int IssuedQty;
     private int StockValue;
     private String RegisterBy;
+    @JsonFormat(pattern="dd-MM-yyyy HH:mm")
+    private LocalDateTime RegisterDate;
     private String Location;
 
     // Default constructor
     public Transition() {
     }
     public Transition(String username, String itemCode, String itemName, int receivedQty, int issuedQty, String location) {
-
         this.ItemCode = itemCode;
         this.ItemName = itemName;
         this.RegisterBy = username;
@@ -36,6 +38,7 @@ public class Transition {
         this.IssuedQty = issuedQty;
         this.Location = location;
         this.StockValue = receivedQty - issuedQty;
+        this.RegisterDate = LocalDateTime.now();
     }
 
 }

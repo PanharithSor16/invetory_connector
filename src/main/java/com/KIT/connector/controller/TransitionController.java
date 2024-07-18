@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
+@CrossOrigin("*")
 @Controller
 @RequestMapping("auth/transfer/")
 public class TransitionController {
@@ -46,16 +48,18 @@ public class TransitionController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
     }
-
     @GetMapping("get")
-    public ResponseEntity<?> getTransfer( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorized){
+    public ResponseEntity<?> getTransfer( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                          @RequestParam(required = false) String NameCode){
         try {
             String token = authorized.replace("Bearer ", "").trim();
             String username = jwtHelper.extractUsername(token);
             UserDetails userDetails = userService.loadUserByUsername(username);
-
-            if (jwtHelper.validateToken(token, userDetails)) {
+            if (jwtHelper.validateToken(token, userDetails) && NameCode == null) {
                 List<Transition> transitionList = transitionRepository.findAll();
+                return ResponseEntity.ok(transitionList);
+            } else if (jwtHelper.validateToken(token, userDetails) &&  NameCode != null) {
+                List<Transition> transitionList = transitionRepository.getAllItem(NameCode);
                 return ResponseEntity.ok(transitionList);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -63,6 +67,43 @@ public class TransitionController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
         }
-
     }
+    @GetMapping("getByUser")
+    public ResponseEntity<?> getTransferByUser( @RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                          @RequestParam(required = false) String NameCode){
+        try {
+            String token = authorized.replace("Bearer ", "").trim();
+            String username = jwtHelper.extractUsername(token);
+            UserDetails userDetails = userService.loadUserByUsername(username);
+            if (jwtHelper.validateToken(token, userDetails) && NameCode == null) {
+                List<Transition> transitionList = transitionRepository.getAllItemUser(username);
+                return ResponseEntity.ok(transitionList);
+            } else if (jwtHelper.validateToken(token, userDetails) &&  NameCode != null) {
+                List<Transition> transitionList = transitionRepository.getAllItemByUser(NameCode, username);
+                return ResponseEntity.ok(transitionList);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
+        }
+    }
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> deleteById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                        @PathVariable("id") long id){
+        try {
+            String token = authorized.replace("Bearer ", "").trim();
+            String username = jwtHelper.extractUsername(token);
+            UserDetails userDetails = userService.loadUserByUsername(username);
+            if (jwtHelper.validateToken(token, userDetails)){
+                transitionRepository.deleteById(id);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body("Success");
+            }else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
+        }
+    }
+
 }

@@ -7,6 +7,7 @@ import com.KIT.connector.repository.MasterItemRepository;
 import com.KIT.connector.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
+@CrossOrigin("*")
 @Controller
 @RequestMapping("auth/masteritem")
 public class MasterItemController {
@@ -48,12 +51,36 @@ public class MasterItemController {
         }
     }
     @GetMapping("get")
-    public ResponseEntity<?> getMasterItem(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized){
+    public ResponseEntity<?> getMasterItem(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                           @RequestParam(required = false) String NameCode){
         try {
             String token = authorized.replace("Bearer ", "").trim();
             String username = jwtHelper.extractUsername(token);
             UserDetails userDetails = userService.loadUserByUsername(username);
-            if (jwtHelper.validateToken(token, userDetails)){
+            if (jwtHelper.validateToken(token, userDetails) && NameCode == null){
+                List<MasterItem> masterItemList = masterItemRepository.findAll();
+                return ResponseEntity.ok(masterItemList);
+            } else if (jwtHelper.validateToken(token, userDetails) && NameCode != null) {
+                List<MasterItem> masterItemList = masterItemRepository.getItemByNameCode(NameCode);
+                return ResponseEntity.ok(masterItemList);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid request: " + e.getMessage());
+        }
+    }
+    @GetMapping("getNameCode")
+    public ResponseEntity<?> getItemNameCode(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                             @RequestParam(required = false) String NameCode){
+        try{
+            String token = authorized.replace("Bearer ", "").trim();
+            String username = jwtHelper.extractUsername(token);
+            UserDetails userDetails = userService.loadUserByUsername(username);
+            if (jwtHelper.validateToken(token, userDetails) && NameCode != null){
+                List<MasterItem> masterItemList = masterItemRepository.getItemByNameCode(NameCode);
+                return ResponseEntity.ok(masterItemList);
+            } else if (jwtHelper.validateToken(token, userDetails) && NameCode == null) {
                 List<MasterItem> masterItemList = masterItemRepository.findAll();
                 return ResponseEntity.ok(masterItemList);
             } else {

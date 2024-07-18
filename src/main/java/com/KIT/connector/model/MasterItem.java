@@ -1,13 +1,10 @@
 package com.KIT.connector.model;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.springframework.format.annotation.NumberFormat;
+
 
 @Getter
 @Setter
@@ -27,8 +24,8 @@ public class MasterItem {
     private String Maker;
     private int MOQ;
     private String Location;
-    public MasterItem(){}
-
+    public MasterItem(){
+    }
     public MasterItem(String itemName, String code, String location, String maker, int moq, String type) {
         this.ItemName = itemName;
         this.Maker = maker;
@@ -37,4 +34,5 @@ public class MasterItem {
         this.MOQ = moq;
         this.Type = type;
     }
+
 }
