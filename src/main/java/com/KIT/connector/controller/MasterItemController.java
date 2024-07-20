@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -90,8 +91,38 @@ public class MasterItemController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid request: " + e.getMessage());
         }
     }
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> DeleteMasterItem(){
-        return null;
+    @GetMapping(value = "get/{id}")
+    public ResponseEntity<?> getItemById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                         @PathVariable Long id){
+       try {
+           String token = authorized.replace("Bearer ", "").trim();
+           String username = jwtHelper.extractUsername(token);
+           UserDetails userDetails = userService.loadUserByUsername(username);
+           if (jwtHelper.validateToken(token, userDetails) ){
+               MasterItem masterItem = masterItemRepository.findAllById(id);
+               return ResponseEntity.ok(masterItem);
+           } else {
+               return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+           }
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid request: " + e.getMessage());
+       }
+    }
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> deleteById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                        @PathVariable("id") long id){
+        try {
+            String token = authorized.replace("Bearer ", "").trim();
+            String username = jwtHelper.extractUsername(token);
+            UserDetails userDetails = userService.loadUserByUsername(username);
+            if (jwtHelper.validateToken(token, userDetails)){
+                masterItemRepository.deleteById(id);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body("Success");
+            }else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
+        }
     }
 }

@@ -27,6 +27,7 @@ public class Transition {
     private LocalDateTime RegisterDate;
     private String Location;
 
+
     // Default constructor
     public Transition() {
     }
