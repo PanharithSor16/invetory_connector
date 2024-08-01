@@ -26,6 +26,7 @@ public class Transition {
     @JsonFormat(pattern="dd-MM-yyyy HH:mm")
     private LocalDateTime RegisterDate;
     private String Location;
+    private Boolean Status;
 
 
     // Default constructor
@@ -40,6 +41,7 @@ public class Transition {
         this.Location = location;
         this.StockValue = receivedQty - issuedQty;
         this.RegisterDate = LocalDateTime.now();
+        this.Status = true;
     }
 
 }

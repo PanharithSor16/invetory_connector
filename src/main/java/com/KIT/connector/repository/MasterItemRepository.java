@@ -15,4 +15,6 @@ public interface MasterItemRepository extends JpaRepository<MasterItem, Long> {
 
 
     MasterItem findAllById(Long id);
+@Query("SELECT u FROM MasterItem u WHERE u.ItemCode = :ItemCode ")
+    MasterItem findItemCode(@Param("ItemCode") String ItemCode);
 }

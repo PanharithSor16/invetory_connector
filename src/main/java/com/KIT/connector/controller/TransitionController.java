@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 @CrossOrigin("*")
 @Controller
 @RequestMapping("auth/transfer/")
@@ -69,10 +71,7 @@ public class TransitionController {
             String token = authorized.replace("Bearer ", "").trim();
             String username = jwtHelper.extractUsername(token);
             UserDetails userDetails = userService.loadUserByUsername(username);
-            if (jwtHelper.validateToken(token, userDetails) && NameCode == null) {
-                List<Transition> transitionList = transitionRepository.findAll();
-                return ResponseEntity.ok(transitionList);
-            } else if (jwtHelper.validateToken(token, userDetails) &&  NameCode != null) {
+            if (jwtHelper.validateToken(token, userDetails) && NameCode != null) {
                 List<Transition> transitionList = transitionRepository.getAllItem(NameCode);
                 return ResponseEntity.ok(transitionList);
             } else {
@@ -119,6 +118,8 @@ public class TransitionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
         }
     }
+
+    // I should @PutMapping but it has some problem so I use
     @DeleteMapping("delete/{id}")
     public ResponseEntity<?> deleteById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
                                         @PathVariable("id") long id){
@@ -127,7 +128,10 @@ public class TransitionController {
             String username = jwtHelper.extractUsername(token);
             UserDetails userDetails = userService.loadUserByUsername(username);
             if (jwtHelper.validateToken(token, userDetails)){
-                transitionRepository.deleteById(id);
+//                transitionRepository.deleteById(id);
+                Optional<Transition> transition = transitionRepository.findById(id);
+                transition.get().setStatus(false);
+                transitionRepository.save(transition.get());
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body("Success");
             }else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");

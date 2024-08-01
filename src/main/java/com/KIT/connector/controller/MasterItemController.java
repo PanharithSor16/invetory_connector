@@ -35,7 +35,10 @@ public class MasterItemController {
         String username = jwtHelper.extractUsername(token);
         UserDetails userDetails = userService.loadUserByUsername(username);
         boolean isAuth = jwtHelper.validateToken(token, userDetails);
-        if (isAuth){
+        MasterItem checkIsAlready= masterItemRepository.findItemCode(reqMasterItem.getItemCode());
+        if (isAuth && checkIsAlready != null){
+            return ResponseEntity.status((HttpStatus.BAD_REQUEST)).body("The code is already");
+        } else if (isAuth && checkIsAlready == null) {
             MasterItem masterItem = new MasterItem(
                     reqMasterItem.getItemName(),
                     reqMasterItem.getItemCode(),
