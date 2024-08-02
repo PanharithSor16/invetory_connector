@@ -124,12 +124,13 @@ public class TransitionController {
     public ResponseEntity<?> deleteById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
                                         @PathVariable("id") long id){
         try {
+            Optional<Transition> transition = transitionRepository.findById(id);
+            TransitionDto toDelete = transitionRepository.getTransitionCompare(transition.get().getItemCode(), transition.get().getItemName());
             String token = authorized.replace("Bearer ", "").trim();
             String username = jwtHelper.extractUsername(token);
             UserDetails userDetails = userService.loadUserByUsername(username);
-            if (jwtHelper.validateToken(token, userDetails)){
+            if (jwtHelper.validateToken(token, userDetails) && (toDelete.getStockValue() - transition.get().getReceivedQty()) >= 0){
 //                transitionRepository.deleteById(id);
-                Optional<Transition> transition = transitionRepository.findById(id);
                 transition.get().setStatus(false);
                 transitionRepository.save(transition.get());
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body("Success");
