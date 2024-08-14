@@ -8,6 +8,7 @@ import com.KIT.connector.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @Controller
@@ -102,7 +104,7 @@ public class MasterItemController {
            String username = jwtHelper.extractUsername(token);
            UserDetails userDetails = userService.loadUserByUsername(username);
            if (jwtHelper.validateToken(token, userDetails) ){
-               MasterItem masterItem = masterItemRepository.findAllById(id);
+               Optional<MasterItem> masterItem = masterItemRepository.findById(id);
                return ResponseEntity.ok(masterItem);
            } else {
                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -121,6 +123,26 @@ public class MasterItemController {
             if (jwtHelper.validateToken(token, userDetails)){
                 masterItemRepository.deleteById(id);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body("Success");
+            }else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
+        }
+    }
+    @PutMapping("update/{id}")
+    public ResponseEntity<?> updateById(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized,
+                                        @RequestBody MasterItem masterItem,
+                                        @PathVariable("id") long id){
+        try {
+            MasterItem masterItemUpdateById = masterItemRepository.findAllById(id);
+            String token = authorized.replace("Bearer ", "").trim();
+            String username = jwtHelper.extractUsername(token);
+            UserDetails userDetails = userService.loadUserByUsername(username);
+            if (jwtHelper.validateToken(token, userDetails)){
+                masterItemUpdateById.setLocation(masterItem.getLocation());
+                masterItemRepository.save(masterItemUpdateById);
+                return ResponseEntity.ok(masterItemUpdateById);
             }else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
             }

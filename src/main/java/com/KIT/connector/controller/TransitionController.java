@@ -132,6 +132,7 @@ public class TransitionController {
             if (jwtHelper.validateToken(token, userDetails) && (toDelete.getStockValue() - transition.get().getReceivedQty()) >= 0){
 //                transitionRepository.deleteById(id);
                 transition.get().setStatus(false);
+                transition.get().setRegisterDate(LocalDateTime.now());
                 transitionRepository.save(transition.get());
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body("Success");
             }else {
@@ -143,3 +144,4 @@ public class TransitionController {
     }
 
 }
+    
