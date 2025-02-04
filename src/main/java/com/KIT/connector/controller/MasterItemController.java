@@ -32,7 +32,6 @@ public class MasterItemController {
     @PostMapping("create")
     public ResponseEntity<?> createMasterItem(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorized
     ,@Valid @RequestBody MasterItem reqMasterItem){
-
         String token = authorized.replace("Bearer ", "").trim();
         String username = jwtHelper.extractUsername(token);
         UserDetails userDetails = userService.loadUserByUsername(username);

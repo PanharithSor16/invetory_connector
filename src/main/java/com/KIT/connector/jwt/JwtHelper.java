@@ -80,12 +80,10 @@ public class JwtHelper {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername(), accessTokenExpirationMs);
     }
-
     public String generateRefreshToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername(), refreshTokenExpirationMs);
     }
-
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

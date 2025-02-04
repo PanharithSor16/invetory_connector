@@ -28,11 +28,10 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
-        String jwt =null;
+        String jwt = null;
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
             jwt = authorizationHeader.substring(7);
             try {
-
                 username = jwtHelper.extractUsername(jwt);
             }catch (ExpiredJwtException e){
                 System.out.println(" JWT token is expired");

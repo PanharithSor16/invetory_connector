@@ -17,7 +17,6 @@ public class User {
     private String username;
     private String password;
     private String fullName;
-
     public User() {
         // Default constructor
     }
