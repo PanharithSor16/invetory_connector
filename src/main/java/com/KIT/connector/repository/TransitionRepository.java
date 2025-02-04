@@ -20,7 +20,7 @@ public interface TransitionRepository extends JpaRepository<Transition, Long> {
     @Query("SELECT u FROM Transition u WHERE u.RegisterBy = ':username' And u.Status = true ")
     List<Transition> getAllItemUser(@Param("username") String username);
 
-    // for Transition
+    // For Transition
     @Query("SELECT u FROM Transition u WHERE (u.ItemCode LIKE CONCAT('%', :NameCode, '%') OR u.ItemName LIKE CONCAT('%', :NameCode, '%')) And u.Status = true")
     List<Transition> getAllItem(@Param("NameCode") String NameCode);
 

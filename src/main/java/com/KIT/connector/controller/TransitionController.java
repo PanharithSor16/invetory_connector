@@ -51,7 +51,9 @@ public class TransitionController {
                        reqTransition.getItemName(),
                        reqTransition.getReceivedQty(),
                        reqTransition.getIssuedQty(),
-                       reqTransition.getLocation()
+                       reqTransition.getLocation(),
+                       reqTransition.getRemark(),
+                       reqTransition.getTransferType()
                );
                transitionRepository.save(transition);
                return ResponseEntity.ok(HttpStatus.CREATED);

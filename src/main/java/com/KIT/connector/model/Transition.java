@@ -27,10 +27,23 @@ public class Transition {
     private LocalDateTime RegisterDate;
     private String Location;
     private Boolean Status;
+    private String Remark;
+    private String TransferType;
 
-
+    public Transition(){}
     // Default constructor
-    public Transition() {
+    public Transition(String username, String itemCode, String itemName, int receivedQty, int issuedQty, String location, String remark, String transferType) {
+        this.ItemCode = itemCode;
+        this.ItemName = itemName;
+        this.RegisterBy = username;
+        this.ReceivedQty = receivedQty;
+        this.IssuedQty = issuedQty;
+        this.Location = location;
+        this.StockValue = receivedQty - issuedQty;
+        this.RegisterDate = LocalDateTime.now();
+        this.Status = true;
+        this.Remark = remark;
+        this.TransferType = transferType;
     }
     public Transition(String username, String itemCode, String itemName, int receivedQty, int issuedQty, String location) {
         this.ItemCode = itemCode;
